@@ -1,0 +1,34 @@
+﻿<Window x:Class="ModbusWPFproject.WP_Editor_DirectoryName_Input"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:winex="https://github.com/yariker/WindowExtras.Wpf"
+        xmlns:local="clr-namespace:ModbusWPFproject"
+        mc:Ignorable="d"
+        Title="Введите имя файла" Height="250" Width="450"
+        WindowStyle="None" 
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        AllowsTransparency="True"
+        Background="Transparent">
+
+    <winex:WindowEx.WindowShadow>
+        <winex:WindowShadow OffsetY="0" Opacity="0.2" Radius="60" />
+    </winex:WindowEx.WindowShadow>
+
+    <Border Background="#EEEEEE" CornerRadius="20">
+        <Border CornerRadius="20" Margin="7" BorderThickness="1" BorderBrush="LightGray">
+            <Grid x:Name="WP_Editor_Directoryname_Input_Grid">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="0.8*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Введите имя директории" FontSize="22" FontFamily="Inter" Foreground="{Binding WP_Editor_Directoryname_Input_Textblock}" HorizontalAlignment="Center" Grid.Row="0" VerticalAlignment="Center" Margin="0" />
+                <TextBox x:Name="WP_Editor_Directoryname_Input_Textbox" Text="{Binding WP_Editor_Directoryname_Input_Name, UpdateSourceTrigger=PropertyChanged}" FontSize="22" FontFamily="Inter" HorizontalAlignment="Center" Margin="0,80,0,0" Grid.Row="0" VerticalAlignment="Center"  Width="400" Height="40" PreviewTouchUp="WP_Editor_Directoryname_Input_Textbox_PreviewTouchUp"/>
+                <Button x:Name="WP_Editor_Directoryname_Input_Button_Go" FontSize="22" FontFamily="Inter" Foreground="White" Width="100" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" Content="ОК" Click="WP_Editor_Directoryname_Input_Click" Grid.Row="1"/>
+                <Button x:Name="WP_Editor_Directoryname_Input_Button_Close" FontSize="15" FontFamily="Inter" Background="#EEEEEE" BorderBrush="LightGray" Foreground="LightGray" Width="30" Height="30" Padding="0" Content="Х" Click="WP_Editor_Directoryname_Input_Button_Close_Click" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10" Grid.Row="0" Grid.Column="1"/>
+            </Grid>
+        </Border>
+    </Border>
+</Window>

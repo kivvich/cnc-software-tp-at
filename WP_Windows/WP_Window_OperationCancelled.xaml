@@ -1,0 +1,32 @@
+﻿<Window x:Class="ModbusWPFproject.WP_Window_OperationCancelled"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:winex="https://github.com/yariker/WindowExtras.Wpf"
+        xmlns:local="clr-namespace:ModbusWPFproject"
+        mc:Ignorable="d"
+        Title="Ошибка выполнения операции" Height="250" Width="450"
+        WindowStyle="None" 
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        AllowsTransparency="True"
+        Background="Transparent">
+
+    <winex:WindowEx.WindowShadow>
+        <winex:WindowShadow OffsetY="0" Opacity="0.2" Radius="60" />
+    </winex:WindowEx.WindowShadow>
+
+    <Border Background="#EEEEEE" CornerRadius="20">
+        <Border CornerRadius="20" Margin="7" BorderThickness="1" BorderBrush="LightGray">
+            <Grid x:Name="WP_Editor_Error_Grid">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="0.8*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="{Binding WP_Editor_OperationText_Textblock}" FontSize="22" FontFamily="Inter" Foreground="{Binding WP_Editor_Directoryname_Input_Textblock}" HorizontalAlignment="Center" Grid.Row="0" VerticalAlignment="Center" Margin="0,30,0,0" TextAlignment="Center"></TextBlock>
+                <Button x:Name="WP_Editor_Error_Button_Go" FontSize="22" FontFamily="Inter" Foreground="White" Width="100" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,30" Content="ОК" Click="WP_Editor_Error_Click" Grid.Row="1"/>
+            </Grid>
+        </Border>
+    </Border>
+</Window>

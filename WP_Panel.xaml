@@ -1,0 +1,1867 @@
+﻿<Window x:Class="ModbusWPFproject.Window1"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ModbusWPFproject"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        mc:Ignorable="d"
+        WindowStyle="None"
+        WindowState="Maximized"
+        Title="Главный экран" Height="1080" Width="1920"
+        >
+
+
+    <Window.Resources>
+        
+        <Style x:Key="DataGridCellStyle" TargetType="{x:Type DataGridCell}">
+            <Setter Property="TextBlock.FontFamily" Value="Inter Light"/>
+            <Setter Property="TextBlock.VerticalAlignment" Value="Center"/>
+            <Setter Property="TextBlock.FontSize" Value="25"/>
+            <Setter Property="Height" Value="50"/>
+        </Style>
+
+        <Style x:Key="CustomScrollViewerStyle" TargetType="{x:Type ScrollViewer}">
+            <Setter Property="Background" Value="LightGray"/>
+            <Setter Property="BorderBrush" Value="DarkGray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <Style x:Key="CustomCheckBox" TargetType="{x:Type CheckBox}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0" Width="80" Height="30">
+                                <Rectangle Fill="Transparent" />
+                                <Border CornerRadius="10" BorderBrush="#76ACAE" BorderThickness="1" x:Name="ToggleBorder">
+                                    <Ellipse Fill="Gray" Height="20" Width="20" HorizontalAlignment="Left" Margin="4,0" VerticalAlignment="Center" x:Name="ToggleEllipse"/>
+                                </Border>
+                            </Grid>
+                            <ContentPresenter Grid.Column="1" Margin="4,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="ToggleEllipse" Property="HorizontalAlignment" Value="Right" />
+                                <Setter TargetName="ToggleBorder" Property="BorderBrush" Value="#76ACAE" />
+                                <Setter TargetName="ToggleBorder" Property="Background" Value="#76ACAE" />
+                                <Setter TargetName="ToggleEllipse" Property="Fill" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="ToggleBorder" Property="BorderThickness" Value="1.5" />
+                                <Setter TargetName="ToggleBorder" Property="BorderBrush" Value="#76ACAE"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"></Setter>
+        </Style>
+        
+        <Style x:Key="Sidemenu_Buttons_Style" TargetType="{x:Type Border}">
+                <Setter Property="Background">
+                    <Setter.Value>
+                        <SolidColorBrush Color="#FF76ABAE"/>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background">
+                            <Setter.Value>
+                                <SolidColorBrush Color="#FF266E71"/>
+                            </Setter.Value>
+                        </Setter>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+    </Window.Resources>
+
+    
+    <!-- Разметка всего экрана -->
+
+    <Grid Background="#EEEEEE" ShowGridLines="False" SnapsToDevicePixels="True">        
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="0.1*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="0.13*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- БОКОВОЕ МЕНЮ -->
+
+            <!-- Основная часть-->
+            <Grid Grid.Column="1" Grid.Row="0" Background="#31363F" ShowGridLines="False">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.1*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="{Binding Labels_State}" Grid.Row="0" Foreground="#EEEEEE" FontSize="52" FontFamily="Inter Semibold" HorizontalAlignment="Center" VerticalAlignment="Center" Cursor=""/>
+
+                <Grid Grid.Row="1" IsEnabled="{Binding WP_Menu_IsEnabled}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Button x:Name="Button_mode_AUTO" BorderBrush="{Binding button_mode_auto_borderbrush}" IsEnabled="{Binding Button_AUTO_Enabled}" Background="{Binding button_mode_auto_color}" FontFamily="Inter" Foreground="#EEEEEE" FontSize="25" Width="Auto" Height="Auto" Grid.Row="0" Margin="5,5" Click="Button_mode_AUTO_Click" Cursor="None">
+                    <TextBlock Text="АВТО" TextWrapping="Wrap" TextAlignment="Center" Foreground="#EEEEEE" FontFamily="Inter" FontSize="25" Cursor=""/>
+                </Button>
+
+                <Button  x:Name="Button_mode_1FRAME" BorderBrush="{Binding button_1frame_color_borderbrush}" IsEnabled="{Binding Button_1FRAME_Enabled}" Background="{Binding button_1frame_color}" FontFamily="Inter" Foreground="#EEEEEE" FontSize="25" Width="Auto" Height="Auto" Grid.Row="1" Margin="5,5" Click="Button_mode_1FRAME_Click" Cursor="None">
+                    <TextBlock Text="РУЧНОЙ ВВОД КАДРА" TextWrapping="Wrap" TextAlignment="Center" Foreground="#EEEEEE" FontFamily="Inter" FontSize="25" Cursor=""/>
+                </Button>
+
+                <Button x:Name="Button_mode_1AXIS" BorderBrush="{Binding button_1axis_borderbrush}" IsEnabled="{Binding Button_1AXIS_Enabled}" Background="{Binding button_1axis_color}" FontFamily="Inter" Foreground="#EEEEEE" FontSize="25" Width="Auto" Height="Auto" Grid.Row="2" Margin="5,5" Click="Button_mode_1AXIS_Click" Cursor="None">
+                <TextBlock TextWrapping="Wrap" TextAlignment="Center" Foreground="#EEEEEE" FontFamily="Inter" FontSize="24" Cursor="">ОДНООСЕВАЯ ОБРАБОТКА</TextBlock>
+                </Button>
+
+                <Button x:Name="Button_mode_MANUAL" BorderBrush="{Binding button_manual_borderbrush}" IsEnabled="{Binding Button_MANUAL_Enabled}" Background="{Binding button_manual_color}" FontFamily="Inter" Foreground="#EEEEEE" FontSize="25" Width="Auto" Height="Auto" Grid.Row="3" Margin="5,5" Click="Button_mode_MANUAL_Click" Cursor="None">
+                    <TextBlock Text="РУЧНЫЕ ПЕРЕМЕЩЕНИЯ" TextWrapping="Wrap" TextAlignment="Center" Foreground="#EEEEEE" FontFamily="Inter" FontSize="22" Cursor=""/>
+                </Button>
+
+                <Button x:Name="Button_mode_MEASURE" BorderBrush="{Binding button_measure_borderbrush}" IsEnabled="{Binding Button_MEASURE_Enabled}" Background="{Binding button_measure_color}" FontFamily="Inter" Foreground="#EEEEEE" FontSize="25" Width="Auto" Height="Auto" Grid.Row="4" Margin="5,5" Click="Button_mode_MEASURE_Click" Cursor="None">
+                <TextBlock TextWrapping="Wrap" TextAlignment="Center" Foreground="#EEEEEE" FontFamily="Inter" FontSize="24" Cursor="">ИЗМЕРЕНИЯ <LineBreak/> И ПРИВЯЗКИ</TextBlock>
+                </Button>
+
+                <Button x:Name="Button_mode_FINDNULL" BorderBrush="{Binding button_findnull_borderbrush}" IsEnabled="{Binding Button_FINDNULL_Enabled}" Background="{Binding button_findnull_color}" FontFamily="Inter" Foreground="#EEEEEE" Content="ПОИСК НУЛЯ" FontSize="25" Width="Auto" Height="Auto" Grid.Row="5" Margin="5,5" Click="Button_mode_FINDNULL_Click" Cursor="None"/>
+
+                <Button x:Name="Button_EDITOR" FontFamily="Inter" IsEnabled="{Binding Button_EDITOR_Enabled}" Foreground="#EEEEEE" Content="РЕДАКТОР" FontSize="25" Width="Auto" Height="Auto" Grid.Row="6" Margin="5,5" Click="Button_EDITOR_Click"/>
+                <Button x:Name="Button_SETTINGS" FontFamily="Inter" IsEnabled="{Binding Button_SETTINGS_Enabled}" Foreground="#EEEEEE" Content="НАСТРОЙКИ" FontSize="25" Width="Auto" Height="Auto" Grid.Row="7" Margin="5,5" Click="Button_SETTINGS_Click" Cursor="Hand"/>
+                <Button x:Name="Button_DIAG" FontFamily="Inter" IsEnabled="{Binding Button_DIAG_Enabled}" Foreground="#EEEEEE" Margin="5,5,5,0" Content="ДИАГНОСТИКА" FontSize="22" Width="Auto" Height="Auto" Grid.Row="8" Cursor="Hand" Click="Button_DIAG_Click" />
+            </Grid>
+        </Grid>
+            <!-- конец -->
+        
+            <!-- Нижняя часть - (время/дата) -->
+
+            <Grid Grid.Column="1" Grid.Row="2" Background="#31363F" ShowGridLines="False" Cursor="">
+            
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="0.8*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock x:Name="TimeText" Text="{Binding TimeText}" FontFamily="Inter Light" FontSize="30" Foreground="#EEEEEE" HorizontalAlignment="Center" VerticalAlignment="Bottom" Grid.Row="0" Cursor=""/>
+                <TextBlock x:Name="DateText" Text="{Binding DateText}" FontFamily="Inter Light" FontSize="20" Foreground="#EEEEEE" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Row="1" />
+
+            </Grid>
+
+            <!-- конец -->
+        
+        <!-- конец БОКОВОЕ МЕНЮ -->
+
+        <!-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+        <!-- МЕНЮ ДИАГНОСТИКИ -->
+        <Border x:Name="WP_DIAG" Margin="300,100,300,100" BorderBrush="White" BorderThickness="1" Background="White" CornerRadius="30" d:Visibility="{Binding WP_Window_Diag_Visibility}" Panel.ZIndex="4">
+            <Border.Effect>
+                <DropShadowEffect Opacity="0.3" BlurRadius="40"/>
+            </Border.Effect>
+
+            <Border.Style>
+                <Style>
+                    <Style.Resources>
+                        <Storyboard x:Key="FadeInMenu">
+                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="{x:Null}">
+                                <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                                <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1"/>
+                            </DoubleAnimationUsingKeyFrames>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="{x:Null}">
+                                <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="{x:Static Visibility.Visible}"/>
+                            </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                        <Storyboard x:Key="FadeOutMenu">
+                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="{x:Null}">
+                                <EasingDoubleKeyFrame KeyTime="0" Value="1"/>
+                                <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                            </DoubleAnimationUsingKeyFrames>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="{x:Null}">
+                                <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="{x:Static Visibility.Visible}"/>
+                                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Collapsed}"/>
+                            </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </Style.Resources>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding WP_DIAG_Open}" Value="true">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard Storyboard="{StaticResource FadeInMenu}"/>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard Storyboard="{StaticResource FadeOutMenu}"/>
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                    <Setter Property="Border.Visibility" Value="Hidden" />
+                </Style>
+            </Border.Style>
+
+            <Border BorderThickness="2" BorderBrush="LightGray" CornerRadius="30" Margin="10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.3*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <Button x:Name="WP_DIAG_Close" FontSize="15" FontFamily="Inter Thin" Background="White" BorderBrush="LightGray" Foreground="LightGray" Width="40" Height="40" Padding="0" Content="Х" Click="WP_DIAG_Close_Click" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="15" Grid.Column="1" Panel.ZIndex="2"/>
+
+                    <Grid x:Name="DIAG_Sensors_Menu" Visibility="{Binding DIAG_Sensors_Menu_Visibility}" Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+
+                        <GroupBox Grid.Row="0" Grid.Column="0" Margin="10,13,0,5">
+                            <GroupBox.Header>
+                                <TextBlock FontFamily="Inter Medium" FontSize="22" HorizontalAlignment="Center" Foreground="White">Датчик №1</TextBlock>
+                            </GroupBox.Header>
+                            <DataGrid Margin="-9"></DataGrid>
+                        </GroupBox>
+
+                        <GroupBox Grid.Row="1" Grid.Column="0" Margin="10,5,0,10">
+                            
+                            <GroupBox.Header>
+                                <TextBlock FontFamily="Inter Medium" FontSize="22" HorizontalAlignment="Center" Foreground="White">Датчик №2</TextBlock>
+                            </GroupBox.Header>
+                            
+                            <DataGrid x:Name="Datagrid_Diag_Sensors_DG2" VerticalScrollBarVisibility="Disabled" Background="#F7F7F7" HorizontalGridLinesBrush="#DFDFDF" VerticalGridLinesBrush="#DFDFDF" GridLinesVisibility="All" Margin="-8" FontFamily="Inter" FontSize="14" AutoGenerateColumns="False">
+
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Параметр" Width="*" IsReadOnly="True" Binding="{Binding Name}">
+
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Setter Property="FontSize" Value="13" />
+                                                <Setter Property="Padding" Value="0" />
+                                                <Setter Property="VerticalAlignment" Value="Center" />
+                                                <Setter Property="TextWrapping" Value="Wrap" />
+                                                <Setter Property="TextAlignment" Value="Justify" />
+                                                <Setter Property="MaxWidth" Value="200" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+
+                                    </DataGridTextColumn>
+
+                                    <DataGridTextColumn Header="Значение" Width="0.51*" IsReadOnly="True" Binding="{Binding Value}">
+
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Setter Property="FontSize" Value="13" />
+                                                <Setter Property="Padding" Value="0" />
+                                                <Setter Property="VerticalAlignment" Value="Center" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+
+                                    </DataGridTextColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </GroupBox>
+
+                        <GroupBox Grid.Row="0" Grid.Column="1" Margin="10,13,10,5">
+                            <GroupBox.Header>
+                                <TextBlock FontFamily="Inter Medium" FontSize="22" HorizontalAlignment="Center" Foreground="White">Датчик №3</TextBlock>
+                            </GroupBox.Header>
+                            <DataGrid Margin="-9"></DataGrid>
+                        </GroupBox>
+
+                        <GroupBox Grid.Row="1" Grid.Column="1" Margin="10,5,10,10">
+                            <GroupBox.Header>
+                                <TextBlock FontFamily="Inter Medium" FontSize="22" HorizontalAlignment="Center" Foreground="White">Датчик №4</TextBlock>
+                            </GroupBox.Header>
+                            <DataGrid Margin="-9"></DataGrid>
+                        </GroupBox>
+
+                    </Grid>
+
+                    <Grid x:Name="DIAG_Gen_Menu" Visibility="{Binding DIAG_Gen_Menu_Visibility}" Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.9*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.2*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        
+                        <GroupBox Grid.Row="0" Grid.Column="0" Margin="10,13,0,5">
+                            <GroupBox.Header>
+                                <TextBlock FontFamily="Inter Medium" FontSize="19" HorizontalAlignment="Center" Foreground="White">Смена режима</TextBlock>
+                            </GroupBox.Header>
+                            
+                            <Grid>
+                                <TextBox x:Name="DIAG_Gen_txt" Margin="5,0,0,0" Width="220" HorizontalAlignment="Left" FontFamily="Inter" FontSize="30"></TextBox>
+                                <Button x:Name="DIAG_Gen_txt_button" Width="100" HorizontalAlignment="Right" Content="Сменить" FontFamily="Inter" Foreground="White" Click="DIAG_Gen_txt_button_click"></Button>
+                            </Grid>
+                            
+                            </GroupBox>
+                    </Grid>
+
+                    <Border CornerRadius="0" Grid.Column="0" BorderBrush="LightGray" BorderThickness="0,0,2,0">
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <fa:ImageAwesome Foreground="White" Margin="30,0,0,0" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Center" Icon="Tachometer" Width="40" Height="40" Panel.ZIndex="1"/>
+                            <fa:ImageAwesome Foreground="White" Margin="20,0,0,0" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Center" Icon="Usb" Width="40" Height="40" Panel.ZIndex="1"/>
+                            <fa:ImageAwesome Foreground="White" Margin="40,0,0,0" Grid.Row="7" HorizontalAlignment="Left" VerticalAlignment="Center" Icon="ArrowCircleOutlineRight" Width="40" Height="40" Panel.ZIndex="1"/>
+
+                            <Border Style="{StaticResource Sidemenu_Buttons_Style}" x:Name="DIAG_Menu_Button_1" CornerRadius="30,0,0,0" Grid.Row="0" BorderThickness="2,2,2,1" BorderBrush="#B1D5D7" PreviewMouseDown="DIAG_Menu_Button_Sensors_PreviewTouchDown">
+                                <TextBlock Margin="0,0,30,0" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="30" FontFamily="Inter Light" Foreground="White">Датчики</TextBlock>
+                            </Border>
+
+                            <Border Style="{StaticResource Sidemenu_Buttons_Style}" x:Name="DIAG_Menu_Button_2" Grid.Row="1" BorderThickness="2,1,2,1" BorderBrush="#B1D5D7">
+                                <TextBlock Margin="0,0,20,0" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="30" FontFamily="Inter Light" Foreground="White" PreviewMouseDown="DIAG_Menu_Button_Generator_PreviewTouchDown">Генератор</TextBlock>
+                            </Border>
+
+                            <Border Style="{StaticResource Sidemenu_Buttons_Style}" x:Name="DIAG_Menu_Button_3" Grid.Row="2" BorderThickness="2,1,2,1" BorderBrush="#B1D5D7">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" FontFamily="Inter Light" Foreground="White">Сеть</TextBlock>
+                            </Border>
+
+                            <Border Style="{StaticResource Sidemenu_Buttons_Style}" x:Name="DIAG_Menu_Button_4" Grid.Row="3" BorderThickness="2,1,2,1" BorderBrush="#B1D5D7">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" FontFamily="Inter Light" Foreground="White">Плата</TextBlock>
+                            </Border>
+
+                            <Border Style="{StaticResource Sidemenu_Buttons_Style}" x:Name="DIAG_Menu_Button_5" Grid.Row="4" BorderThickness="2,1,2,1" BorderBrush="#B1D5D7">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" FontFamily="Inter Light" Foreground="White">Установка</TextBlock>
+                            </Border>
+
+                            <Border Style="{StaticResource Sidemenu_Buttons_Style}" x:Name="DIAG_Menu_Button_6" Grid.Row="5" BorderThickness="2,1,2,1" BorderBrush="#B1D5D7">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" FontFamily="Inter Light" Foreground="White">Насос</TextBlock>
+                            </Border>
+
+                            <Border Style="{StaticResource Sidemenu_Buttons_Style}" x:Name="DIAG_Menu_Button_7" Grid.Row="6" BorderThickness="2,1,2,1" BorderBrush="#B1D5D7">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" FontFamily="Inter Light" Foreground="White">Общее</TextBlock>
+                            </Border>
+
+                            <Border Style="{StaticResource Sidemenu_Buttons_Style}" x:Name="DIAG_Menu_Button_CloseApp" CornerRadius="0,0,0,30" Grid.Row="7" BorderThickness="2,2,2,1" BorderBrush="#B1D5D7" PreviewMouseDown="DIAG_Menu_Button_CloseApp_PreviewTouchDown">
+                                <TextBlock Margin="0,0,50,0" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="30" FontFamily="Inter Light" Foreground="White">Выход</TextBlock>
+                            </Border>
+
+                        </Grid>
+                    </Border>
+                    <!-- НАСТРОЙКИ - ОБЛАСТЬ МЕНЮШЕК -->
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                        </Grid.RowDefinitions>
+
+                    </Grid>
+
+                </Grid>
+
+            </Border>
+        </Border>
+        <!-- МЕНЮ НАСТРОЕК -->
+        <Border x:Name="WP_Settings" Margin="300,100,300,100" BorderBrush="White" BorderThickness="1" Background="White" CornerRadius="30" d:Visibility="{Binding WP_Window_Settings_Visibility}" Panel.ZIndex="3">
+            <Border.Effect>
+                <DropShadowEffect Opacity="0.3" BlurRadius="40"/>
+            </Border.Effect>
+
+            <Border.Style>
+                <Style>
+                    <Style.Resources>
+                        <Storyboard x:Key="FadeInMenu">
+                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="{x:Null}">
+                                <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                                <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1"/>
+                            </DoubleAnimationUsingKeyFrames>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="{x:Null}">
+                                <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="{x:Static Visibility.Visible}"/>
+                            </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                        <Storyboard x:Key="FadeOutMenu">
+                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="{x:Null}">
+                                <EasingDoubleKeyFrame KeyTime="0" Value="1"/>
+                                <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                            </DoubleAnimationUsingKeyFrames>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="{x:Null}">
+                                <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="{x:Static Visibility.Visible}"/>
+                                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Collapsed}"/>
+                            </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </Style.Resources>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding WP_Settings_Open}" Value="true">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard Storyboard="{StaticResource FadeInMenu}"/>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard Storyboard="{StaticResource FadeOutMenu}"/>
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                    <Setter Property="Border.Visibility" Value="Hidden" />
+                </Style>
+            </Border.Style>
+
+            <Border BorderThickness="2" BorderBrush="LightGray" CornerRadius="30" Margin="10">
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.3*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <Button x:Name="WP_Settings_Close" FontSize="15" FontFamily="Inter Thin" Background="White" BorderBrush="LightGray" Foreground="LightGray" Width="40" Height="40" Padding="0" Content="Х" Click="WP_Settings_Close_Click" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="15" Grid.Column="1" Panel.ZIndex="2"/>
+
+                    <Border CornerRadius="0" Grid.Column="0" BorderBrush="LightGray" BorderThickness="0,0,2,0">
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Border Style="{StaticResource Sidemenu_Buttons_Style}" x:Name="SETTINGS_Menu_Button_1" CornerRadius="30,0,0,0" Grid.Row="0" BorderThickness="2,2,2,1" BorderBrush="#B1D5D7" PreviewMouseDown="DIAG_Menu_Button_Sensors_PreviewTouchDown">
+                                <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" FontFamily="Inter Light" Foreground="White">Общие</TextBlock>
+                            </Border>
+
+                            <Border Style="{StaticResource Sidemenu_Buttons_Style}" x:Name="SETTINGS_Menu_Button_2" Grid.Row="1" BorderThickness="2,1,2,1" BorderBrush="#B1D5D7">
+                                <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" FontFamily="Inter Light" Foreground="White">Интерфейс</TextBlock>
+                            </Border>
+
+                            <Border Style="{StaticResource Sidemenu_Buttons_Style}" x:Name="SETTINGS_Menu_Button_3" Grid.Row="2" BorderThickness="2,1,2,1" BorderBrush="#B1D5D7">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" FontFamily="Inter Light" Foreground="White">Сеть</TextBlock>
+                            </Border>
+
+                            <Border Style="{StaticResource Sidemenu_Buttons_Style}" x:Name="SETTINGS_Menu_Button_4" Grid.Row="3" BorderThickness="2,1,2,1" BorderBrush="#B1D5D7">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" FontFamily="Inter Light" Foreground="White">Плата</TextBlock>
+                            </Border>
+
+                            <Border Style="{StaticResource Sidemenu_Buttons_Style}" x:Name="SETTINGS_Menu_Button_5" Grid.Row="4" BorderThickness="2,1,2,1" BorderBrush="#B1D5D7">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" FontFamily="Inter Light" Foreground="White">Установка</TextBlock>
+                            </Border>
+
+                            <Border Style="{StaticResource Sidemenu_Buttons_Style}" x:Name="SETTINGS_Menu_Button_6" Grid.Row="5" BorderThickness="2,1,2,1" BorderBrush="#B1D5D7">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" FontFamily="Inter Light" Foreground="White">Общее</TextBlock>
+                            </Border>
+
+                            <Border Style="{StaticResource Sidemenu_Buttons_Style}" x:Name="SETTINGS_Menu_Button_7" Grid.Row="6" BorderThickness="2,1,2,1" BorderBrush="#B1D5D7">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" FontFamily="Inter Light" Foreground="White">Общее</TextBlock>
+                            </Border>
+
+                            <Border Style="{StaticResource Sidemenu_Buttons_Style}" x:Name="SETTINGS_Menu_Button_8" CornerRadius="0,0,0,30" Grid.Row="7" BorderThickness="2,2,2,1" BorderBrush="#B1D5D7">
+                                <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" FontFamily="Inter Light" Foreground="White">Общее</TextBlock>
+                            </Border>
+                        </Grid>
+                    </Border>
+                    <!-- НАСТРОЙКИ - ОБЛАСТЬ МЕНЮШКИ -->
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Border CornerRadius="0" Grid.Row="0" BorderThickness="0,0,0,2" VerticalAlignment="Top" Height="95" Width="Auto" BorderBrush="LightGray">
+                            <CheckBox Margin="10,0,0,0" Style="{StaticResource CustomCheckBox}">
+                                <TextBlock FontSize="22" FontFamily="Inter" Margin="10,0,0,0">Включить что-нибудь полезное</TextBlock>
+                            </CheckBox>
+                        </Border>
+                        <Border CornerRadius="0" Grid.Row="1" BorderThickness="0,0,0,2" VerticalAlignment="Top" Height="95" Width="Auto" BorderBrush="LightGray">
+                            <CheckBox Margin="10,0,0,0" Style="{StaticResource CustomCheckBox}">
+                                <TextBlock FontSize="22" FontFamily="Inter" Margin="10,0,0,0">Включить что-нибудь полезное</TextBlock>
+                            </CheckBox>
+                        </Border>
+                    </Grid>
+
+                </Grid>
+
+            </Border>
+        </Border>
+        <!-- ОКНО ЗАГРУЗКИ ПРОГРАММЫ -->
+        <Border x:Name="WP_LoadPRG" Margin="300,100,300,100" BorderBrush="White" BorderThickness="1" Background="White" CornerRadius="30" d:Visibility="{Binding WP_Window_ChoosePRG_Visibility}" Panel.ZIndex="1">
+            <Border.Effect>
+                <DropShadowEffect Opacity="0.3" BlurRadius="40"/>
+            </Border.Effect>
+            
+            <Border.Style>
+                <Style>
+                    <Style.Resources>
+                        <Storyboard x:Key="FadeInMenu">
+                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="{x:Null}">
+                                <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                                <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="1"/>
+                            </DoubleAnimationUsingKeyFrames>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="{x:Null}">
+                                <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="{x:Static Visibility.Visible}"/>
+                            </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                        <Storyboard x:Key="FadeOutMenu">
+                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="{x:Null}">
+                                <EasingDoubleKeyFrame KeyTime="0" Value="1"/>
+                                <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                            </DoubleAnimationUsingKeyFrames>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="{x:Null}">
+                                <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="{x:Static Visibility.Visible}"/>
+                                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Collapsed}"/>
+                            </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </Style.Resources>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding WP_LoadPRG_Open}" Value="true">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard Storyboard="{StaticResource FadeInMenu}"/>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard Storyboard="{StaticResource FadeOutMenu}"/>
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                    <Setter Property="Border.Visibility" Value="Hidden" />
+                </Style>
+            </Border.Style>
+            
+            <Border BorderThickness="2" BorderBrush="LightGray" CornerRadius="30" Margin="10">
+                
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.7*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <Button x:Name="WP_LoadPRG_Close" FontSize="15" FontFamily="Inter Thin" Background="White" BorderBrush="LightGray" Foreground="LightGray" Width="40" Height="40" Padding="0" Content="Х" Click="WP_LoadPRG_Close_Click" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="15" Grid.Column="1" Panel.ZIndex="2"/>
+                    
+                    <Border CornerRadius="0" Grid.Column="0" BorderBrush="LightGray" BorderThickness="0,0,2,0">
+                        <TreeView x:Name="WP_LoadPRGPreview" FontFamily="Inter" FontSize="22" SelectedItemChanged="LoadPRGTreeView_SelectedItem_Touch" Margin="10">
+                            <TreeView.Resources>
+                                <Style TargetType="{x:Type ScrollViewer}">
+                                    <Setter Property="PanningMode" Value="None"/>
+                                </Style>
+
+                                <Style TargetType="{x:Type ScrollBar}">
+                                    <Setter Property="Stylus.IsFlicksEnabled" Value="True" />
+                                    <Setter Property="Background" Value="#EEEEEE"/>
+                                    <Setter Property="Width" Value="40"/>
+                                </Style>
+                            </TreeView.Resources>
+                            <TreeView.ItemContainerStyle>
+                                <Style TargetType="{x:Type TreeViewItem}">
+                                    <Setter Property="IsExpanded" Value="True"/>
+                                    <Setter Property="Margin" Value="0,15,0,0"/>
+                                </Style>
+                            </TreeView.ItemContainerStyle>
+                            <TreeView.ItemTemplate>
+                                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                    <TextBlock Text="{Binding Name}"/>
+                                </HierarchicalDataTemplate>
+                            </TreeView.ItemTemplate>
+                        </TreeView>
+                    </Border>
+
+                    <Border CornerRadius="0" Grid.Column="1" BorderThickness="0,0,0,2" VerticalAlignment="Top" Height="650" Width="Auto" BorderBrush="LightGray">
+                        <RichTextBox x:Name="WP_LoadPRGPreview_RTB" Width="Auto" Margin="0,20,15,0" HorizontalAlignment="Left" Height="635"  FontFamily="Inter" IsReadOnly="True" FontSize="25" VerticalScrollBarVisibility="Auto" Cursor="None">
+                            <RichTextBox.Resources>
+                                <Style TargetType="{x:Type ScrollViewer}">
+                                    <Setter Property="PanningMode" Value="None"/>
+                                </Style>
+
+                                <Style TargetType="{x:Type ScrollBar}">
+                                    <Setter Property="Stylus.IsFlicksEnabled" Value="True" />
+                                    <Setter Property="Background" Value="#EEEEEE"/>
+                                    <Setter Property="Width" Value="40"/>
+                                </Style>
+
+                                <Style TargetType="{x:Type Paragraph}">
+                                    <Setter Property="Margin" Value="10"/>
+                                    <Setter Property="LineHeight" Value="40"/>
+                                </Style>
+
+                            </RichTextBox.Resources>
+                        </RichTextBox>
+                    </Border>
+
+                    <Button Width="170" Height="50" VerticalAlignment="Bottom" Margin="0,0,0,30" Content="Загрузить" FontFamily="Inter" FontSize="22" Foreground="White" Grid.Column="1" Click="WP_LoadPRG_Button_Go_Click"></Button>
+                  
+                </Grid>
+                
+            </Border>
+        </Border>
+        <!-- Разметка рабочего окна РЕДАКТОР -->
+        <!-- {Binding WorkPanel_Editor_Visible}  ИЗМЕНИТЬ ЧТОБЫ РЕДАКТОР ОТКРЫВАЛСЯ-->
+        <Grid x:Name="Grid_WorkWindow_Editor" Margin="5" Grid.Row="0" Grid.Column="0" ShowGridLines="False" Visibility="{Binding WorkPanel_Editor_Visible}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.4*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Effect">
+                        <Setter.Value>
+                            <BlurEffect Radius="{Binding WP_General_BlurRadius}" KernelType="Gaussian"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding WP_General_BlurRadius}" Value="0">
+                            <Setter Property="Effect" Value="{x:Null}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <Grid x:Name="Grid_Editor_Main" Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    
+                </Grid.RowDefinitions>
+
+                <GroupBox Grid.Row="0" Margin="5">
+                    <GroupBox.Header>
+                        <TextBlock FontFamily="Inter Medium" FontSize="22" HorizontalAlignment="Center" Foreground="White">Редактор</TextBlock>
+                    </GroupBox.Header>
+
+                    <RichTextBox x:Name="WP_RichTextBoxEditor" FontFamily="Inter" FontSize="25" BorderThickness="2" VerticalScrollBarVisibility="Auto" PreviewTouchUp="Touch_Open_Virtual_Keyboard">
+                        <RichTextBox.Resources>
+                            <Style TargetType="{x:Type Paragraph}">
+                                <Setter Property="Margin" Value="0"/>
+                                <Setter Property="LineHeight" Value="40"/>
+                            </Style>
+                            <Style TargetType="{x:Type ScrollViewer}">
+                                <Setter Property="PanningMode" Value="None"/>
+                            </Style>
+
+                            <Style TargetType="{x:Type ScrollBar}">
+                                <Setter Property="Stylus.IsFlicksEnabled" Value="True" />
+                                <Setter Property="Background" Value="#EEEEEE"/>
+                                <Setter Property="Width" Value="50"/>
+                            </Style>
+                        </RichTextBox.Resources>
+                    </RichTextBox>
+                </GroupBox>
+            </Grid>
+
+            <Grid x:Name="Grid_Editor_Directory" Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+
+                </Grid.RowDefinitions>
+
+                <GroupBox Margin="5" Grid.Row="0">
+
+                    <GroupBox.Header>
+                        <TextBlock FontFamily="Inter Medium" FontSize="22" HorizontalAlignment="Center" Foreground="White">Директория</TextBlock>
+                    </GroupBox.Header>
+
+                    <TreeView x:Name="WP_fileTreeView" FontFamily="Inter" FontSize="22" SelectedItemChanged="fileTreeView_SelectedItem_Touch">
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="{x:Type TreeViewItem}">
+                                <Setter Property="IsExpanded" Value="True"/>
+                            </Style>
+                        </TreeView.ItemContainerStyle>
+                    </TreeView>
+                </GroupBox>
+            </Grid>
+        </Grid>
+        
+        <!-- Разметка рабочего окна -->
+        <!-- {Binding WorkPanel_General_Visible} -->
+        <Grid x:Name="Grid_WorkWindow_Common" Margin="5" Grid.Row="0" ShowGridLines="False" Visibility="{Binding WorkPanel_General_Visible}">
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="0.35*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="0.9*"/>
+            </Grid.RowDefinitions>
+            
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Effect">
+                        <Setter.Value>
+                            <BlurEffect Radius="{Binding WP_General_BlurRadius}" KernelType="Gaussian"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding WP_General_BlurRadius}" Value="0">
+                            <Setter Property="Effect" Value="{x:Null}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <!-- Окно режимов -->
+            <Grid Grid.Row="1" Grid.Column="1">
+                <GroupBox Margin="5,0,5,0" Background="#F7F7F7">
+                    <GroupBox.Header>
+                        <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center" Foreground="White">Режимы</TextBlock>
+                    </GroupBox.Header>
+
+                    <DataGrid x:Name="Datagrid_Settings_Mode" EnableRowVirtualization="False" SelectionUnit="Cell" Background="#F7F7F7" HorizontalGridLinesBrush="#DFDFDF" VerticalGridLinesBrush="#DFDFDF" GridLinesVisibility="All" Margin="-8" FontFamily="Inter" FontSize="15" AutoGenerateColumns="False" CellEditEnding="DataGrid_Settings_Mode_CellEditEnding" PreparingCellForEdit="Datagrid_Settings_Mode_PreparingCellForEdit">
+                        
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Параметр" Width="*" IsReadOnly="True" Binding="{Binding Name}">
+
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="FontSize" Value="16" />
+                                        <Setter Property="Padding" Value="0" />
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+
+                            </DataGridTextColumn>
+
+                            <DataGridTextColumn Header="Ед." Width="0.3*" IsReadOnly="True" Binding="{Binding Measure}">
+
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="FontSize" Value="16" />
+                                        <Setter Property="Padding" Value="0" />
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Значение" Width="0.51*" Binding="{Binding Value}">
+
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="FontSize" Value="20" />
+                                        <Setter Property="Padding" Value="0" />
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                                
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                        
+                        <DataGrid.Resources>
+                            <Style TargetType="{x:Type ScrollViewer}">
+                                <Setter Property="PanningMode" Value="None"/>
+                            </Style>
+                            <Style TargetType="{x:Type ScrollBar}">
+                                <Setter Property="Stylus.IsFlicksEnabled" Value="True" />
+                                <Setter Property="Background" Value="#EEEEEE"/>
+                                <Setter Property="Width" Value="40"/>
+                            </Style>
+
+                        </DataGrid.Resources>
+                    </DataGrid>
+                </GroupBox>
+            </Grid>
+            <!-- Разметка рабочего окна нижняя половина - РЕЖИМ ИЗМЕРЕНИЙ -->
+            <!-- {Binding Grid_Bottom_MEASURE_Visibility} -->
+            <Grid x:Name="Grid_WorkWindow_Bottom_MEASURE" Grid.Row="1" Grid.Column="0" Visibility="{Binding Grid_Bottom_MEASURE_Visibility}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+
+                <GroupBox Margin="5,0,5,0" Background="#F7F7F7" Height="Auto">
+                    <GroupBox.Header>
+                        <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center" Foreground="White">Режим «Измерения»</TextBlock>
+                    </GroupBox.Header>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.2*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="1" Margin="10,0,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="0.8*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <!-- {Binding WP_Measure_FindCorner_Menu_Visibility} -->
+                            <GroupBox x:Name="WP_Measure_FindCorner_Menu" Visibility="{Binding WP_Measure_FindCorner_Menu_Visibility}" Grid.Column="0" Margin="0,0,5,0">
+                                <GroupBox.Header>
+                                    <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center" Foreground="White">Поиск края</TextBlock>
+                                </GroupBox.Header>
+
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock FontFamily="Inter" FontSize="18" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left">Выбор оси</TextBlock>
+                                    <ComboBox Grid.Row="0" FontFamily="Inter" FontSize="22" SelectedIndex="0" Width="100" HorizontalAlignment="Left" Margin="110,0,0,0">
+                                        <ComboBoxItem>X+</ComboBoxItem>
+                                        <ComboBoxItem>X-</ComboBoxItem>
+                                        <ComboBoxItem>Y+</ComboBoxItem>
+                                        <ComboBoxItem>Y-</ComboBoxItem>
+                                        <ComboBoxItem>Z+</ComboBoxItem>
+                                        <ComboBoxItem>Z-</ComboBoxItem>
+                                    </ComboBox>
+                                    <Button Padding="0" FontFamily="Inter" FontSize="18" Foreground="White" Grid.Row="0" Margin="140,10,5,10" Width="200" Height="60" Click="WP_Measure_Go_Click" Cursor="Hand" HorizontalAlignment="Center">
+                                        <TextBlock Text="ПРОИЗВЕСТИ ПОИСК" TextWrapping="Wrap" TextAlignment="Center" Foreground="White" FontFamily="Inter" FontSize="18" Cursor="" />
+                                    </Button>
+                                </Grid>
+                                
+                            </GroupBox>
+                            <!-- {Binding WP_Measure_FindCenter_Menu_Visibility} -->
+                            <GroupBox x:Name="WP_Measure_FindCenter_Menu" Visibility="{Binding WP_Measure_FindCenter_Menu_Visibility}" Grid.Column="0" Margin="0,0,5,0">
+                                <GroupBox.Header>
+                                    <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center" Foreground="White">Поиск центра</TextBlock>
+                                </GroupBox.Header>
+
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock FontFamily="Inter" FontSize="18" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left">Выбор плоскости</TextBlock>
+                                    <ComboBox Grid.Row="0" FontFamily="Inter" FontSize="22" SelectedIndex="0" Width="100" HorizontalAlignment="Left" Margin="170,0,0,0">
+                                        <ComboBoxItem>X</ComboBoxItem>
+                                        <ComboBoxItem>Y</ComboBoxItem>
+                                        <ComboBoxItem>Z</ComboBoxItem>
+                                        <ComboBoxItem>ZY-</ComboBoxItem>
+                                        <ComboBoxItem>ZX</ComboBoxItem>
+                                    </ComboBox>
+                                    <Button Padding="0" FontFamily="Inter" FontSize="18" Foreground="White" Grid.Row="0" Margin="250,10,5,10" Width="200" Height="60" Click="WP_Measure_Go_Click" Cursor="Hand" HorizontalAlignment="Center">
+                                        <TextBlock Text="ПРОИЗВЕСТИ ПОИСК" TextWrapping="Wrap" TextAlignment="Center" Foreground="White" FontFamily="Inter" FontSize="18" Cursor="" />
+                                    </Button>
+                                </Grid>
+                                
+                            </GroupBox>
+                            <!-- {Binding WP_Measure_FindAngle_Menu_Visibility} -->
+                            <GroupBox x:Name="WP_Measure_FindAngle_Menu" Visibility="{Binding WP_Measure_FindAngle_Menu_Visibility}" Grid.Column="0" Margin="0,0,5,0">
+                                <GroupBox.Header>
+                                    <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center" Foreground="White">Поиск угла</TextBlock>
+                                </GroupBox.Header>
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="0.6*"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <Image Width="Auto" Height="Auto" Source="/ui/ngle.png" Grid.Column="1" Margin="10,0,0,0"/>
+                                    
+                                    <Button Content="жмяк" Padding="0" FontFamily="Inter" FontSize="13" Foreground="White" Grid.Column="1" Margin="0,0,190,160" Width="65" Height="65"></Button>
+                                    <Button Content="жмяк" Padding="0" FontFamily="Inter" FontSize="13" Foreground="White" Grid.Column="1" Margin="0,0,190,-160" Width="65" Height="65"></Button>
+                                    <Button Content="жмяк" Padding="0" FontFamily="Inter" FontSize="13" Foreground="White" Grid.Column="1" Margin="0,0,-210,160" Width="65" Height="65"></Button>
+                                    <Button Content="жмяк" Padding="0" FontFamily="Inter" FontSize="13" Foreground="White" Grid.Column="1" Margin="0,0,-210,-160" Width="65" Height="65"></Button>
+
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                            <RowDefinition></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <GroupBox Margin="5,5,5,10" Grid.Row="0" >
+                                            <GroupBox.Header>
+                                                <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center" Foreground="White">Ход по оси Х</TextBlock>
+                                            </GroupBox.Header>
+                                            <TextBox Text="" FontFamily="Inter" FontSize="30" Height="40" PreviewTouchUp="Touch_Open_Virtual_Keyboard"/>
+                                        </GroupBox>
+                                        <GroupBox Margin="5,5,5,10" Grid.Row="1" >
+                                            <GroupBox.Header>
+                                                <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center" Foreground="White">Ход по оси Y</TextBlock>
+                                            </GroupBox.Header>
+                                            <TextBox Text="" FontFamily="Inter" FontSize="30" Height="40" PreviewTouchUp="Touch_Open_Virtual_Keyboard"/>
+                                        </GroupBox>
+                                        <Button Padding="0" FontFamily="Inter" FontSize="18" Foreground="White" Grid.Row="2" Margin="5,10,5,10" Width="Auto" Height="Auto" Click="WP_Measure_Go_Click" Cursor="Hand">
+                                            <TextBlock Text="ПРОИЗВЕСТИ ПОИСК" TextWrapping="Wrap" TextAlignment="Center" Foreground="White" FontFamily="Inter" FontSize="18" Cursor="" />
+                                        </Button>
+                                    </Grid>
+                                </Grid>
+
+                            </GroupBox>
+
+                            <GroupBox x:Name="WP_Measure_MeauserResult_Menu" Margin="5,0,0,0" Grid.Column="1" Visibility="{Binding DataGrid_Measure_Result_Visibility}" >
+                                <GroupBox.Header>
+                                    <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center" Foreground="White">Результаты измерений</TextBlock>
+                                </GroupBox.Header>
+
+                                <DataGrid x:Name="DataGrid_Measure_Result" BorderBrush="#76ABAE" Margin="-10" ItemsSource="{Binding Datagrid_Inform_Messages}" AutoGenerateColumns="False" HeadersVisibility="Column" HorizontalGridLinesBrush="#DFDFDF" VerticalGridLinesBrush="#DFDFDF" FontSize="18">
+                                    <DataGrid.Resources>
+                                        <Style TargetType="{x:Type ScrollViewer}">
+                                            <Setter Property="PanningMode" Value="None"/>
+                                        </Style>
+
+                                        <Style TargetType="{x:Type ScrollBar}">
+                                            <Setter Property="Stylus.IsFlicksEnabled" Value="True" />
+                                            <Setter Property="Background" Value="#EEEEEE"/>
+                                            <Setter Property="Width" Value="40"/>
+                                        </Style>
+
+                                        <Style TargetType="DataGrid">
+                                            <Setter Property="Background" Value="#F7F7F7"/>
+                                        </Style>
+                                    </DataGrid.Resources>
+
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Измерения №1" Width="*" Binding="{Binding Converter={local:RowToIndexConverter2}, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}}">
+
+                                            <DataGridTextColumn.ElementStyle>
+                                                <Style TargetType="{x:Type TextBlock}">
+                                                    <Setter Property="Margin" Value="-4" />
+                                                </Style>
+                                            </DataGridTextColumn.ElementStyle>
+
+                                        </DataGridTextColumn>
+
+                                        <DataGridTextColumn Header="Измерения №2" Width="*" Binding="{Binding UpdateSourceTrigger=PropertyChanged}" >
+                                            <DataGridTextColumn.ElementStyle>
+                                                <Style TargetType="{x:Type TextBlock}">
+                                                    <Setter Property="Margin" Value="-4" />
+                                                </Style>
+                                            </DataGridTextColumn.ElementStyle>
+                                        </DataGridTextColumn>
+                                    </DataGrid.Columns>
+
+                                </DataGrid>
+                            </GroupBox>
+                        </Grid>
+                        
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="0.4*"></RowDefinition>
+                                <RowDefinition Height="*"></RowDefinition>
+                            </Grid.RowDefinitions>
+
+                            <GroupBox Background="#F7F7F7" Height="Auto" Grid.Row="0">
+                                <GroupBox.Header>
+                                    <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center" Foreground="White">Система координат</TextBlock>
+                                </GroupBox.Header>
+
+                                <ComboBox SelectedIndex="0" Width="Auto" Height="Auto" FontFamily="Inter" FontSize="25">
+                                    <ComboBoxItem Content="G51"/>
+                                    <ComboBoxItem Content="G52"/>
+                                    <ComboBoxItem Content="G53"/>
+                                    <ComboBoxItem Content="G54"/>
+                                    <ComboBoxItem Content="G55"/>
+                                </ComboBox>
+                                
+                            </GroupBox>
+
+                            <GroupBox Margin="0,5,0,0" Background="#F7F7F7" Height="Auto" Grid.Row="1">
+                            <GroupBox.Header>
+                                <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center" Foreground="White">Типы измерений</TextBlock>
+                            </GroupBox.Header>
+
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                    </Grid.RowDefinitions>
+
+                                    <Button x:Name="Button_Measure_FindCorner" FontFamily="Inter" Foreground="White" Content="Поиск края" FontSize="20" Width="Auto" Height="Auto" Grid.Row="0" Margin="5,5" Click="Button_Measure_FindCorner_Click"/>
+                                    <Button x:Name="Button_Measure_FindCentrCircle" FontFamily="Inter" Foreground="White" Content="Поиск центра окружности" FontSize="20" Width="Auto" Height="Auto" Grid.Row="1" Margin="5,5" Click="Button_Measure_FindCentrCircle_Click"/>
+                                    <Button x:Name="Button_Measure_FindAngle" FontFamily="Inter" Foreground="White" Content="Поиск угла" FontSize="20" Width="Auto" Height="Auto" Grid.Row="2" Margin="5,5" Click="Button_Measure_FindAngle_Click"/>
+
+                                </Grid>
+                        </GroupBox>
+                    </Grid>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+            <!-- Разметка рабочего окна нижняя половина - ПОИСК НУЛЯ -->
+            <!-- {Binding Grid_Bottom_FINDNULL_Visibility} -->
+            <Grid x:Name="Grid_WorkWindow_Bottom_FINDNULL" Grid.Row="1" Grid.Column="0" Visibility="{Binding Grid_Bottom_FINDNULL_Visibility}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+
+                <GroupBox Margin="5,0,5,0" Background="#F7F7F7" Height="Auto">
+                    <GroupBox.Header>
+                        <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center" Foreground="White">Режим «Поиск нуля»</TextBlock>
+                    </GroupBox.Header>
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.2*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <GroupBox Margin="5,0,800,0" Background="#F7F7F7" Height="Auto" Grid.Column="1">
+                            <GroupBox.Header>
+                                <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center"  Foreground="White">Действия</TextBlock>
+                            </GroupBox.Header>
+
+                            <Button x:Name="WP_Button_FindNull_RIF" Background="#266E71" BorderBrush="#266E71" VerticalAlignment="Top" Foreground="#EEEEEE" IsEnabled="{Binding button_SPDswitch_enabled}" FontFamily="Inter Light" FontSize="15" Width="Auto" Height="90" Grid.Row="0" Margin="5" HorizontalAlignment="Left" Click="btnSPDswitch_Click" Cursor="None">
+                            <TextBlock Text="ОБНУЛИТЬ ПО ТЕКУЩИМ КООРДИНАТАМ" TextWrapping="Wrap" TextAlignment="Center" Foreground="White" FontFamily="Inter" FontSize="18" Cursor=""/>
+                            </Button>
+
+                        </GroupBox>
+
+                        <GroupBox Margin="5,0,5,0" Background="#F7F7F7" Height="Auto" Grid.Column="0">
+                            <GroupBox.Header>
+                                <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center" Foreground="White">Выбор оси</TextBlock>
+                            </GroupBox.Header>
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"></RowDefinition>
+                                    <RowDefinition Height="*"></RowDefinition>
+                                    <RowDefinition Height="*"></RowDefinition>
+                                    <RowDefinition Height="*"></RowDefinition>
+                                    <RowDefinition Height="*"></RowDefinition>
+                                    <RowDefinition Height="*"></RowDefinition>
+                                    <RowDefinition Height="*"></RowDefinition>
+                                </Grid.RowDefinitions>
+
+
+                                <Button x:Name="WP_FindNull_Button_GoNull_X" FontFamily="Inter" Height="Auto" Width="Auto" FontSize="15" Foreground="#EEEEEE" Content="X" Grid.Row="0" Grid.Column="0" Margin="5" Click="Work_X_goNull_Click" />
+                                <Button x:Name="WP_FindNull_Button_GoNull_Y" FontFamily="Inter" Height="Auto" Width="Auto" FontSize="15" Foreground="#EEEEEE" Content="Y" Grid.Row="1" Grid.Column="0" Margin="5" Click="Work_X_goNull_Click" />
+                                <Button x:Name="WP_FindNull_Button_GoNull_Z" FontFamily="Inter" Height="Auto" Width="Auto" FontSize="15" Foreground="#EEEEEE" Content="Z" Grid.Row="2" Grid.Column="0" Margin="5" Click="Work_X_goNull_Click" />
+                                <Button x:Name="WP_FindNull_Button_GoNull_A" FontFamily="Inter" Height="Auto" Width="Auto" FontSize="15" Foreground="#EEEEEE" Content="A" Grid.Row="3" Grid.Column="0" Margin="5" Click="Work_X_goNull_Click" />
+                                <Button x:Name="WP_FindNull_Button_GoNull_B" FontFamily="Inter" Height="Auto" Width="Auto" FontSize="15" Foreground="#EEEEEE" Content="B" Grid.Row="4" Grid.Column="0" Margin="5" Click="Work_X_goNull_Click" />
+                                <Button x:Name="WP_FindNull_Button_GoNull_C" FontFamily="Inter" Height="Auto" Width="Auto" FontSize="15" Foreground="#EEEEEE" Content="C" Grid.Row="5" Grid.Column="0" Margin="5" Click="Work_X_goNull_Click" />
+                                <Button x:Name="WP_FindNull_Button_GoNull_ALL" FontFamily="Inter" Height="Auto" Width="Auto" FontSize="15" Foreground="#EEEEEE" Content="Все" Grid.Row="6" Grid.Column="0" Margin="5" Click="Work_X_goNull_Click" />
+
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+            <!-- Разметка рабочего окна нижняя половина - РУЧНОЙ ВВОД КАДРА -->
+            <!-- {Binding Grid_Bottom_MDI_Visibility} -->
+            <Grid x:Name="Grid_WorkWindow_Bottom_MDI" Grid.Row="1" Grid.Column="0" Visibility="{Binding Grid_Bottom_MDI_Visibility}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="0.3*"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+
+                <GroupBox Margin="5,0,5,0" Background="#F7F7F7">
+                    <GroupBox.Header>
+                        <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center" Foreground="White">Окно ввода команды</TextBlock>
+                    </GroupBox.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="0.05*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox x:Name="TextBox_CMD_MDI" Margin="0,0,5,0" FontFamily="Inter" FontSize="28" PreviewTouchDown="Touch_Open_Virtual_Keyboard" Grid.Column="0"></TextBox>
+                        <Button x:Name="Button_Cmd_Go" Width="auto" Height="auto" Grid.Column="1" Content="ОК" FontFamily="Inter" FontSize="18" Foreground="White" Click="btnInput_Click"></Button>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+
+            <!-- Разметка рабочего окна нижняя половина - РУЧНОЙ РЕЖИМ -->
+            <!-- Visibility="{Binding Grid_Bottom_Manual_Visibility}" -->
+            <Grid x:Name="Grid_WorkWindow_Bottom_MANUAL" Grid.Row="1" Grid.Column="0" Visibility="{Binding Grid_Bottom_Manual_Visibility}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid Grid.Row="1" Grid.Column="0" Margin="5,0,5,0">
+                        <GroupBox Background="#F7F7F7">
+
+                            <GroupBox.Header>
+                                <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center" Foreground="White">Ручное управление</TextBlock>
+                            </GroupBox.Header>
+
+                            <Grid Margin="-9">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="2.7*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Button x:Name="WP_Button_Manual_Zplus" Background="#266E71" BorderBrush="#266E71" Foreground="#EEEEEE" IsEnabled="{Binding button_Z_plus_enabled}" FontFamily="Inter Light" Content="Z+" FontSize="30" Width="100" Height="100" Grid.Column="0" Grid.Row="0" Margin="0,0,0,150" PreviewTouchDown="btnZplus_MouseDown" PreviewTouchUp="btnZplus_MouseUp" />
+                                <Button x:Name="WP_Button_Manual_Zmin" Background="#266E71" BorderBrush="#266E71" Foreground="#EEEEEE" IsEnabled="{Binding button_Z_min_enabled}" FontFamily="Inter Light" Content="Z-" FontSize="30" Width="100" Height="100" Grid.Column="0" Grid.Row="0" Margin="0,0,0,-150" PreviewTouchDown="btnZmin_MouseDown" PreviewTouchUp="btnZmin_MouseUp" />
+                                <Button x:Name="WP_Button_Manual_Xmin" Background="#266E71" BorderBrush="#266E71" Foreground="#EEEEEE" IsEnabled="{Binding button_X_min_enabled}" FontFamily="Inter Light" Content="X-" FontSize="30" Width="100" Height="100" Grid.Column="1" Grid.Row="0" PreviewTouchDown="btnXmin_MouseDown" PreviewTouchUp="btnXmin_MouseUp" />
+                                <Button x:Name="WP_Button_Manual_Yplus" Background="#266E71" BorderBrush="#266E71" Foreground="#EEEEEE" IsEnabled="{Binding button_Y_plus_enabled}" FontFamily="Inter Light" Content="Y+" FontSize="30" Width="100" Height="100" Grid.Column="2" Grid.Row="0" Margin="0,0,0,150" PreviewTouchDown="btnYplus_MouseDown" PreviewTouchUp="btnYplus_MouseUp" />
+                                <Button x:Name="WP_Button_Manual_Ymin" Background="#266E71" BorderBrush="#266E71" Foreground="#EEEEEE" IsEnabled="{Binding button_Y_min_enabled}" FontFamily="Inter Light" Content="Y-" FontSize="30" Width="100" Height="100" Grid.Column="2" Grid.Row="0" Margin="0,0,0,-150" PreviewTouchDown="btnYmin_MouseDown" PreviewTouchUp="btnYmin_MouseUp" />
+                                <Button x:Name="WP_Button_Manual_Xplus" Background="#266E71" BorderBrush="#266E71" Foreground="#EEEEEE" IsEnabled="{Binding button_X_plus_enabled}" FontFamily="Inter Light" Content="X+" FontSize="30" Width="100" Height="100" Grid.Column="3" Grid.Row="0" PreviewTouchDown="btnXplus_MouseDown" PreviewTouchUp="btnXplus_MouseUp"/>
+                                <Button x:Name="WP_Button_Manual_Cplus" Background="#266E71" BorderBrush="#266E71" Foreground="#EEEEEE" IsEnabled="{Binding button_C_plus_enabled}" FontFamily="Inter Light" Content="C+" FontSize="30" Width="100" Height="100" Grid.Column="4" Grid.Row="0" Margin="0,0,0,150" PreviewTouchDown="btnCplus_MouseDown" PreviewTouchUp="btnCplus_MouseUp" />
+                                <Button x:Name="WP_Button_Manual_Cmin" Background="#266E71" BorderBrush="#266E71" Foreground="#EEEEEE" IsEnabled="{Binding button_C_min_enabled}" FontFamily="Inter Light" Content="C-" FontSize="30" Width="100" Height="100" Grid.Column="4" Grid.Row="0" Margin="0,0,0,-150" PreviewTouchDown="btnCmin_MouseDown" PreviewTouchUp="btnCmin_MouseUp" />
+                                
+                                <Button x:Name="WP_Button_Manual_Aplus" Background="#266E71" BorderBrush="#266E71" Foreground="#EEEEEE" IsEnabled="{Binding buttoаn_A_plus_enabled}" FontFamily="Inter Light" Content="A+" FontSize="30" Width="100" Height="100" Grid.Column="5" Grid.Row="0" Margin="0,0,120,150" PreviewTouchDown="btnAplus_MouseDown" PreviewTouchUp="btnAplus_MouseUp" />
+                                <Button x:Name="WP_Button_Manual_Amin" Background="#266E71" BorderBrush="#266E71" Foreground="#EEEEEE" IsEnabled="{Binding button_A_min_enabled}" FontFamily="Inter Light" Content="A-" FontSize="30" Width="100" Height="100" Grid.Column="5" Grid.Row="0" Margin="0,0,120,-150" PreviewTouchDown="btnAmin_MouseDown" PreviewTouchUp="btnAmin_MouseUp" />
+                                
+                                <Button x:Name="WP_Button_Manual_Bplus" Background="#266E71" BorderBrush="#266E71" Foreground="#EEEEEE" IsEnabled="{Binding button_B_plus_enabled}" FontFamily="Inter Light" Content="B+" FontSize="30" Width="100" Height="100" Grid.Column="5" Grid.Row="0" Margin="120,0,0,150" PreviewTouchDown="btnBplus_MouseDown" PreviewTouchUp="btnBplus_MouseUp" />
+                                <Button x:Name="WP_Button_Manual_Bmin" Background="#266E71" BorderBrush="#266E71" Foreground="#EEEEEE" IsEnabled="{Binding button_B_min_enabled}" FontFamily="Inter Light" Content="B-" FontSize="30" Width="100" Height="100" Grid.Column="5" Grid.Row="0" Margin="120,0,0,-150" PreviewTouchDown="btnBmin_MouseDown" PreviewTouchUp="btnBmin_MouseUp" />
+
+                                <Button x:Name="WP_Button_Manual_Smth1" Background="#266E71" BorderBrush="#266E71" Foreground="#EEEEEE" IsEnabled="{Binding button_Smth1_enabled}" FontFamily="Inter Light" Content="x100" FontSize="30" Width="100" Height="100" Grid.Column="6" Grid.Row="0" Margin="220,0,0,0" Click="btnSmth1_Click" />
+                                <Button x:Name="WP_Button_Manual_Smth2" Background="#266E71" BorderBrush="#266E71" Foreground="#EEEEEE" IsEnabled="{Binding button_Smth2_enabled}" FontFamily="Inter Light" Content="x10" FontSize="30" Width="100" Height="100" Grid.Column="6" Grid.Row="0" Margin="0" Click="btnSmth2_Click" />
+                                <Button x:Name="WP_Button_Manual_SPD" Background="#266E71" BorderBrush="#266E71" Foreground="#EEEEEE" IsEnabled="{Binding button_SPDswitch_enabled}" FontFamily="Inter Light" Content="x1" FontSize="30" Width="100" Height="100" Grid.Column="6" Grid.Row="0" Margin="0,0,220,0" Click="btnSPDswitch_Click" Cursor="None"/>
+
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+                </Grid>
+            </Grid>
+            <!-- Разметка рабочего окна нижняя половина - ГЛАВНЫЙ ЭКРАН -->
+            <!-- {Binding Grid_Bottom_CMD_GEN_Visibility} -->
+            <Grid x:Name="Grid_WorkWindow_Bottom_CMD_GEN" Grid.Row="1" Grid.Column="0" Visibility="{Binding Grid_Bottom_CMD_GEN_Visibility}">
+                <Grid>
+                    
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="0.65*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <Grid Grid.Row="0" Grid.Column="1">
+                        <Grid Margin="5,0,5,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            
+                            <!-- Параметры генератора -->
+                            <GroupBox Background="#F7F7F7">
+                                <GroupBox.Header>
+                                    
+                                    <TextBlock FontFamily="Inter Medium" FontSize="17" HorizontalAlignment="Center" Foreground="White">
+                                        <Run Text="Параметры генератора"/>
+                                        <Run Text="{Binding Gen_Mode_Num_Now}"/>
+                                    </TextBlock>
+                                    
+                                    </GroupBox.Header>
+
+
+                                <Grid x:Name="Grid_Gen_Info" Background="#F7F7F7" ShowGridLines="False" Width="Auto" Height="Auto" Margin="-9" Visibility="{Binding Grid_Gen_Params_Visibility}">
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="1.2*"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                        <RowDefinition Height="*"></RowDefinition>
+                                    </Grid.RowDefinitions>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,1,0,0" Grid.Row="0" Grid.Column="0">
+                                        <Grid>
+                                            <TextBlock Margin="5" FontFamily="Inter Medium" Foreground="#767676" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Параметр"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,1,0,0" Grid.Row="0" Grid.Column="1">
+                                        <Grid>
+                                            <TextBlock Margin="5" FontFamily="Inter Medium" FontSize="15" Foreground="#767676" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Значение"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,1,0,1" Grid.Row="1" Grid.Column="0">
+                                        <Grid>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Полярность"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,1,1,1" Grid.Row="1" Grid.Column="1">
+                                        <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Grid_GEN_Params_polarity}"/>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,0,1" Grid.Row="2" Grid.Column="0">
+                                        <Grid>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Коэф. усиления"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,1,1" Grid.Row="2" Grid.Column="1">
+                                        <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Grid_GEN_Params_gainFactor}"/>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,0,1" Grid.Row="3" Grid.Column="0">
+                                        <Grid>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Уставка"/>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Right" Text="(В)"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,1,1" Grid.Row="3" Grid.Column="1">
+                                        <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Grid_GEN_Params_ustavka}"/>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,0,1" Grid.Row="4" Grid.Column="0">
+                                        <Grid>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Частота"/>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Right" Text="(кГц)"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,1,1" Grid.Row="4" Grid.Column="1">
+                                        <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Grid_GEN_Params_freq}"/>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,0,1" Grid.Row="5" Grid.Column="0">
+                                        <Grid>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Скважность"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,1,1" Grid.Row="5" Grid.Column="1">
+                                        <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Grid_GEN_Params_skv}"/>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,0,1" Grid.Row="6" Grid.Column="0">
+                                        <Grid>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Рабочий ток"/>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Right" Text="(А)"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,1,1" Grid.Row="6" Grid.Column="1">
+                                        <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Grid_GEN_Params_workTok}"/>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,0,1" Grid.Row="7" Grid.Column="0">
+                                        <Grid>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Поджиговый ток"/>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Right" Text="(А)"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,1,1" Grid.Row="7" Grid.Column="1">
+                                        <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Grid_GEN_Params_arsonTok}"/>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,0,1" Grid.Row="8" Grid.Column="0">
+                                        <Grid>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Защитный ток"/>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Right" Text="(А)"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,1,1" Grid.Row="8" Grid.Column="1">
+                                        <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center"  Text="{Binding Grid_GEN_Params_guardTok}"/>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,0,1" Grid.Row="9" Grid.Column="0">
+                                        <Grid>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Длит. пакета"/>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Right" Text="(мкс)"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,1,1" Grid.Row="9" Grid.Column="1">
+                                        <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center"  Text="{Binding Grid_GEN_Params_package_durability}"/>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,0,1" Grid.Row="10" Grid.Column="0">
+                                        <Grid>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Длит. паузы"/>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Right" Text="(мкс)"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,1,1" Grid.Row="10" Grid.Column="1">
+                                        <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Grid_GEN_Params_pause_durability}"/>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,0,1" Grid.Row="11" Grid.Column="0">
+                                        <Grid>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Титановый импульс"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,1,1" Grid.Row="11" Grid.Column="1">
+                                        <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Grid_GEN_Params_titanium_impulse}"/>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,0,1" Grid.Row="12" Grid.Column="0">
+                                        <Grid>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Ёмкость конд."/>
+                                        </Grid>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,1,1" Grid.Row="12" Grid.Column="1">
+                                        <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Grid_GEN_Params_capacity}"/>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,0,1" Grid.Row="13" Grid.Column="0">
+                                        <Grid>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Дист. релаксации"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,1,1" Grid.Row="13" Grid.Column="1">
+                                        <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Grid_GEN_Params_relaxation_dist}"/>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,0,1" Grid.Row="14" Grid.Column="0">
+                                        <Grid>
+                                            <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Период релаксации"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <Border BorderBrush="#DFDFDF" BorderThickness="1,0,1,1" Grid.Row="14" Grid.Column="1">
+                                        <TextBlock Margin="5" Padding="0" FontFamily="Inter" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Grid_GEN_Params_relaxation_period}"/>
+                                    </Border>
+                                </Grid>
+                            </GroupBox>
+                        </Grid>
+                    </Grid>
+                    <!-- Окно выбора режимов -->
+                    <Grid Grid.Row="0" Grid.Column="2">
+                        <GroupBox Margin="5,0,5,0" Background="#F7F7F7">
+                            <GroupBox.Header>
+                                <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center" Foreground="White">Выбор режима</TextBlock>
+                            </GroupBox.Header>
+                            
+                            <ComboBox x:Name="Combobox_ModeSettings" ItemsSource="{Binding Programm_Setting_Mode_Array}" Height="50" MaxDropDownHeight="330" VerticalAlignment="Top" FontFamily="Inter" FontSize="18" SelectedIndex="-1" SelectionChanged="Combobox_ModeSettings_SelectionChanged" IsEnabled="{Binding Combobox_ModeSetting_Enabled}">
+                                <ComboBox.ItemContainerStyle>
+                                    <Style TargetType="ComboBoxItem">
+                                        <Setter Property="Height" Value="60" />
+                                    </Style>
+                                </ComboBox.ItemContainerStyle>
+
+                                <ComboBox.Resources>
+                                    <Style TargetType="{x:Type ScrollViewer}">
+                                        <Setter Property="PanningMode" Value="None"/>
+                                    </Style>
+                                    <Style TargetType="{x:Type ScrollBar}">
+                                        <Setter Property="Stylus.IsFlicksEnabled" Value="True" />
+                                        <Setter Property="Background" Value="#EEEEEE"/>
+                                        <Setter Property="Width" Value="40"/>
+                                    </Style>
+                                    <Style TargetType="DataGrid">
+                                        <Setter Property="Background" Value="#F7F7F7"/>
+                                    </Style>
+                                </ComboBox.Resources>
+                            </ComboBox>
+                        </GroupBox>
+                    </Grid>
+
+                    <!-- Окно программы с кадрами -->
+                    <GroupBox Margin="5,0,0,0">
+                        
+                        <GroupBox.Header>
+                            <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center"  Foreground="#FFFFFFFF">
+                                <Run Text="Программа"/>
+                                <Run Text="{Binding OpenedProgramName}"/>
+                            </TextBlock>
+                            
+                        </GroupBox.Header>
+
+                        <DataGrid HorizontalGridLinesBrush="#DFDFDF" BorderBrush="#76ABAE" VerticalGridLinesBrush="#DFDFDF" Margin="-10" GridLinesVisibility="All" AutoGenerateColumns="False" x:Name="Datagrid_CMD" CellStyle="{StaticResource DataGridCellStyle}" ItemsSource="{Binding CMD_Array}" SelectionUnit="Cell" HeadersVisibility="None" Width="Auto" Height="Auto" Grid.Column="0">
+                            <DataGrid.Resources>
+
+                                <Style TargetType="{x:Type ScrollViewer}">
+                                    <Setter Property="PanningMode" Value="None"/>
+                                </Style>
+
+                                <Style TargetType="{x:Type ScrollBar}">
+                                    <Setter Property="Stylus.IsFlicksEnabled" Value="True" />
+                                    <Setter Property="Background" Value="#EEEEEE"/>
+                                    <Setter Property="Width" Value="40"/>
+                                </Style>
+
+                                <Style TargetType="DataGrid">
+                                    <Setter Property="Background" Value="#F7F7F7"/>
+                                </Style>
+
+                            </DataGrid.Resources>
+
+                            <DataGrid.RowStyle>
+
+                                <Style TargetType="DataGridRow">
+                                    <Setter Property="IsHitTestVisible" Value="False"/>
+                                </Style>
+
+                            </DataGrid.RowStyle>
+
+                            <DataGrid.Columns>
+                                
+                                <DataGridTextColumn Binding="{Binding Converter={local:RowToIndexConverter2}, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="HorizontalAlignment" Value="Center" />
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                            <Setter Property="FontSize" Value="18" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <DataGridTextColumn Binding="{Binding UpdateSourceTrigger=PropertyChanged}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Margin" Value="10" />
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                </Grid>
+            </Grid>
+            
+
+            <!-- Разметка подачи -->
+            <Grid Grid.Column="3">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="0.3*"></RowDefinition>
+                </Grid.RowDefinitions>
+                
+                <GroupBox FontSize="20" FontFamily="Inter Light" Margin="5,5,5,5" Grid.Column="0" Grid.Row="1" Background="#F7F7F7">
+                    
+                    <GroupBox.Header>
+                        <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center" Foreground="#FFFFFFFF">Подача (%)</TextBlock>
+                    </GroupBox.Header>
+
+                    <Grid>
+                        <TextBlock Text="0" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="18" Width="Auto"  />
+                        <TextBlock Text="100" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="18" Width="Auto"  />
+                        <TextBlock Text="200" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="18" Width="Auto"  />
+                        <Slider x:Name="Slider_Supply" VerticalAlignment="Center" Margin="0,20,0,0" RenderTransformOrigin="0.5,0.5" Value="{Binding Sliders_Supply}" Minimum="0" Maximum="200" Thumb.DragCompleted="SliderSupply_DragCompleted" IsEnabled="{Binding slider_Supply_enabled}" TickFrequency="10"></Slider>
+                    </Grid>
+                </GroupBox>
+                
+                <!-- Окно индикации -->
+                <GroupBox Margin="5,5,5,5" Background="#F7F7F7" Grid.Row="0">
+                    <GroupBox.Header>
+                        <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center"  Foreground="#FFFFFFFF">Индикация</TextBlock>
+                    </GroupBox.Header>
+
+                    <Grid ShowGridLines="True">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.3*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock x:Name="Indication_F_text" FontFamily="Inter" FontSize="30" Text="{Binding Indication_F}" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                        <TextBlock x:Name="Indication_V_text" FontFamily="Inter" FontSize="30" Text="{Binding Indication_V}" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                        <TextBlock x:Name="Indication_Frame_text" FontFamily="Inter" FontSize="30" Text="{Binding Indication_Frame}" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+
+                        <TextBlock Text="0" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="1" Margin="5,10,0,0" FontSize="15"/>
+                        <TextBlock Text="100" HorizontalAlignment="Center" Grid.Column="1" Grid.Row="1" Margin="0,10" FontSize="15"/>
+                        <TextBlock Text="200" HorizontalAlignment="Right" Grid.Column="1" Grid.Row="1" Margin="0,10,5,0" FontSize="15"/>
+                        
+                        <ProgressBar Foreground="{Binding Indication_Progressbar_Foreground}" Background="{Binding Indication_Progressbar_Background}" BorderBrush="{Binding Indication_Progressbar_Borderbrush}" Grid.Row="1" Grid.Column="1" Width="Auto" Height="Auto" Margin="5,30,5,15" Value="{Binding progressBar_Tok_value}" Maximum="300"/>
+
+                        <TextBlock Text="-1" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="2" Margin="5,10,0,0" FontSize="15"/>
+                        <TextBlock Text="0" HorizontalAlignment="Center" Grid.Column="1" Grid.Row="2" Margin="0,10" FontSize="15"/>
+                        <TextBlock Text="1" HorizontalAlignment="Right" Grid.Column="1" Grid.Row="2" Margin="0,10,5,0" FontSize="15"/>
+                        
+                        <Grid Grid.Column="1" Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <ProgressBar x:Name="Progreesbar_Regulator_Right" Value="{Binding Indication_R_r}" Grid.Column="1" Width="152" Height="Auto" HorizontalAlignment="Right" Margin="0,30,5,15" Maximum="1"/>
+                            <ProgressBar x:Name="Progreesbar_Regulator_Left" Value="{Binding Indication_R_r}" Grid.Column="0" Width="152" Height="Auto" HorizontalAlignment="Left" Margin="5,30,0,15" Minimum="1">
+                                <ProgressBar.LayoutTransform>
+                                    <RotateTransform Angle="180"/>
+                                </ProgressBar.LayoutTransform>
+                            </ProgressBar>
+                        </Grid>
+
+                        <TextBlock FontFamily="Inter" FontSize="35" Text="F" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                        <TextBlock FontFamily="Inter" FontSize="35" Text="U" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                        <TextBlock FontFamily="Inter" FontSize="35" Text="R" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                        <TextBlock FontFamily="Inter" FontSize="35" Text="V" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                        <TextBlock FontFamily="Inter" FontSize="22" Text="Кадр" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+
+                    </Grid>
+                </GroupBox>
+            </Grid>
+
+            <!-- Разметка рабочего окна #1 -->
+            <Grid>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="0.3*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="2">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="0.5*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Окно индикации поменбше -->
+                    <GroupBox Margin="5,5,5,5" Background="#F7F7F7" Grid.Row="1" Grid.Column="2">
+                        <GroupBox.Header>
+                            <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center"  Foreground="#FFFFFFFF">Функциональная индикация</TextBlock>
+                        </GroupBox.Header>
+
+                        <Grid ShowGridLines="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.2*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock FontFamily="Inter" FontSize="22" Text="M22 M01 M30 M06 M76" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                            <TextBlock FontFamily="Inter" FontSize="22" Text="G01 G90 G91 G88 G54" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                            <TextBlock FontFamily="Inter" FontSize="25" Text="22" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+
+                            <TextBlock FontFamily="Inter" FontSize="25" Text="M" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock FontFamily="Inter" FontSize="25" Text="G" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                            <TextBlock FontFamily="Inter" FontSize="25" Text="Т" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" />
+
+                        </Grid>
+                    </GroupBox>
+
+                    <!-- Разметка машинные координаты -->
+                    <GroupBox FontSize="20" FontFamily="Inter Light" Margin="5,5,5,5" Grid.Row="0" Background="#F7F7F7">
+
+                        <GroupBox.Header>
+                            <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center"  Foreground="#FFFFFFFF">Машинные координаты</TextBlock>
+                        </GroupBox.Header>
+
+                        <Grid ShowGridLines="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.35*"/>
+                                <ColumnDefinition Width="0.35*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <fa:ImageAwesome Foreground="#FF8FD393" HorizontalAlignment="Center" VerticalAlignment="Center" Icon="CheckCircle" Width="Auto" Height="Auto" Margin="7" Grid.Row="0"/>
+                            <fa:ImageAwesome Foreground="#FFA63B38" HorizontalAlignment="Center" VerticalAlignment="Center" Icon="Ban" Width="Auto" Height="Auto" Margin="7"  Grid.Row="1"/>
+                            <fa:ImageAwesome Foreground="#FF8FD393" HorizontalAlignment="Center" VerticalAlignment="Center" Icon="CheckCircle" Width="Auto" Height="Auto" Margin="7"  Grid.Row="2"/>
+
+                            <TextBlock FontFamily="Inter" FontSize="20" Text="X" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                            <TextBlock FontFamily="Inter" FontSize="20" Text="Y" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                            <TextBlock FontFamily="Inter" FontSize="20" Text="Z" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                            <TextBlock FontFamily="Inter" FontSize="20" Text="A" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                            <TextBlock FontFamily="Inter" FontSize="20" Text="B" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                            <TextBlock FontFamily="Inter" FontSize="20" Text="C" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+
+                            <TextBlock FontFamily="Roboto Mono Regular" FontSize="20" Text="{Binding Coordinates_Machine_X}" Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                            <TextBlock FontFamily="Roboto Mono Regular" FontSize="20" Text="{Binding Coordinates_Machine_Y}" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                            <TextBlock FontFamily="Roboto Mono Regular" FontSize="20" Text="{Binding Coordinates_Machine_Z}" Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                            <TextBlock FontFamily="Roboto Mono Regular" FontSize="20" Text="0" Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                            <TextBlock FontFamily="Roboto Mono Regular" FontSize="20" Text="0" Grid.Row="4" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                            <TextBlock FontFamily="Roboto Mono Regular" FontSize="20" Text="0" Grid.Row="5" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+                <!-- Блок Информация -->
+                <Grid Grid.Row="0" Grid.Column="3" Margin="3.5,5,5,5">
+                    <GroupBox  Background="#F7F7F7">
+                        <GroupBox.Header>
+                            <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center" Foreground="White">Информация</TextBlock>
+                        </GroupBox.Header>
+
+                        <DataGrid x:Name="DataGrid_Inform" BorderBrush="#76ABAE" Margin="-9.7" ItemsSource="{Binding Datagrid_Inform_Messages}" AutoGenerateColumns="False" HeadersVisibility="Column" HorizontalGridLinesBrush="#DFDFDF" VerticalGridLinesBrush="#DFDFDF" FontSize="18">
+                            <DataGrid.Resources>
+                                <Style TargetType="{x:Type ScrollViewer}">
+                                    <Setter Property="PanningMode" Value="None"/>
+                                </Style>
+
+                                <Style TargetType="{x:Type ScrollBar}">
+                                    <Setter Property="Stylus.IsFlicksEnabled" Value="True" />
+                                    <Setter Property="Background" Value="#EEEEEE"/>
+                                    <Setter Property="Width" Value="40"/>
+                                </Style>
+
+                                <Style TargetType="DataGrid">
+                                    <Setter Property="Background" Value="#F7F7F7"/>
+                                </Style>
+                            </DataGrid.Resources>
+
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Код" Width="0.25*" Binding="{Binding Converter={local:RowToIndexConverter2}, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}}">
+
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Margin" Value="-4" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+
+                                </DataGridTextColumn>
+
+                                <DataGridTextColumn Header="Содержание" Width="*" Binding="{Binding UpdateSourceTrigger=PropertyChanged}" >
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Margin" Value="-4" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+
+                        </DataGrid>
+                    </GroupBox>
+                </Grid>
+                
+                <!-- Разметка рабочие координаты -->
+                <GroupBox FontSize="20" FontFamily="Inter Light" Margin="5,5,5,5" Grid.Column="0" Background="#F7F7F7">
+
+                    <GroupBox.Header>
+                        <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center"  Foreground="#FFFFFFFF">Рабочие координаты</TextBlock>
+                    </GroupBox.Header>
+                    
+                    <Grid ShowGridLines="True" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.35*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/> 
+                            <RowDefinition Height="*"/> 
+                            <RowDefinition Height="*"/> 
+                        </Grid.RowDefinitions>
+                        
+                        <Grid Grid.Row="0" Grid.Column="0" Background="{Binding Color_X, UpdateSourceTrigger=PropertyChanged}" PreviewMouseDown="X_choose"/>
+                        <Grid Grid.Row="1" Grid.Column="0" Background="{Binding Color_Y, UpdateSourceTrigger=PropertyChanged}" PreviewMouseDown="Y_choose"/>
+                        <Grid Grid.Row="2" Grid.Column="0" Background="{Binding Color_Z, UpdateSourceTrigger=PropertyChanged}" PreviewMouseDown="Z_choose"/>
+                        
+                        <TextBlock FontFamily="Inter" FontSize="35" Text="X" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5" PreviewMouseDown="X_choose"/>
+                        <TextBlock FontFamily="Inter" FontSize="35" Text="Y" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5" PreviewMouseDown="Y_choose"/>
+                        <TextBlock FontFamily="Inter" FontSize="35" Text="Z" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5" PreviewMouseDown="Z_choose"/>
+                        <TextBlock FontFamily="Inter" FontSize="35" Text="A" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                        <TextBlock FontFamily="Inter" FontSize="35" Text="B" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+                        <TextBlock FontFamily="Inter" FontSize="35" Text="C" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,5"/>
+
+                        <TextBlock FontFamily="Roboto Mono Regular" FontSize="40" Text="{Binding Coordinates_Work_X}" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5,5,20,5"/>
+                        <TextBlock FontFamily="Roboto Mono Regular" FontSize="40" Text="{Binding Coordinates_Work_Y}" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5,5,20,5"/>
+                        <TextBlock FontFamily="Roboto Mono Regular" FontSize="40" Text="{Binding Coordinates_Work_Z}" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5,5,20,5"/>
+                        <TextBlock FontFamily="Roboto Mono Regular" FontSize="40" Text="0.0000" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5,5,20,5"/>
+                        <TextBlock FontFamily="Roboto Mono Regular" FontSize="40" Text="0.0000" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5,5,20,5"/>
+                        <TextBlock FontFamily="Roboto Mono Regular" FontSize="40" Text="0.0000" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5,5,20,5"/>
+
+                    </Grid>
+                </GroupBox>
+                
+                <!-- Сброс в ноль координат рабочих -->
+                <GroupBox FontSize="20" FontFamily="Inter Light" Margin="5,5,5,5" Grid.Column="1" Visibility="{Binding Grid_Upper_AxisNulling_Visibility}" Background="#F7F7F7">
+
+                    <GroupBox.Header>
+                        <Grid>
+                            <TextBlock FontFamily="Inter Medium" FontSize="18" HorizontalAlignment="Center" Foreground="#FFFFFFFF">№ 1</TextBlock>
+                        </Grid>
+                    </GroupBox.Header>
+
+                    <Grid Cursor="" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Button FontFamily="Inter" Height="Auto" Width="Auto" FontSize="15" Foreground="#EEEEEE" Content="X" Grid.Row="0" Grid.Column="0" Margin="10,10,10,10" Click="Work_X_goNull_Click" />
+                        <Button FontFamily="Inter" Height="Auto" Width="Auto" FontSize="15" Foreground="#EEEEEE" Content="X" Grid.Row="1" Grid.Column="0"  Margin="10,10,10,10" Click="Work_Y_goNull_Click"/>
+                        <Button FontFamily="Inter" Height="Auto" Width="Auto" FontSize="15" Foreground="#EEEEEE" Content="X" Grid.Row="2" Grid.Column="0"  Margin="10,10,10,10" Click="Work_Z_goNull_Click"/>
+                        <Button FontFamily="Inter" Height="Auto" Width="Auto" FontSize="15" Foreground="#EEEEEE" Content="X" Grid.Row="3" Grid.Column="0"  Margin="10,10,10,10"/>
+                        <Button FontFamily="Inter" Height="Auto" Width="Auto" FontSize="15" Foreground="#EEEEEE" Content="X" Grid.Row="4" Grid.Column="0"  Margin="10,10,10,10"/>
+                        <Button FontFamily="Inter" Height="Auto" Width="Auto" FontSize="15" Foreground="#EEEEEE" Content="X" Grid.Row="5" Grid.Column="0"  Margin="10,10,10,10"/>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+            <!-- конец -->
+        </Grid>
+        <!-- конец рабочего окна -->
+
+        <!-- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+
+        <!-- Разметка нижнего меню - ОСНОВНОЙ экран -->
+        <Grid Grid.Row="2" Background="#31363F" ShowGridLines="False" Visibility="{Binding Menu_Bottom_Visibility}">
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Нижнее меню #1 - главное -->
+            <Button x:Name="WP_Button_SwitchOn"  Width="Auto" Height="Auto" Grid.Column="0" Margin="5" PreviewMouseDown="WP_Button_SwitchOn_MouseDown" PreviewMouseUp="WP_Button_SwitchOn_MouseUp" >
+                <TextBlock Text="{Binding Textblock_Button_SwitchOn}" TextWrapping="Wrap" TextAlignment="Center" Foreground="#EEEEEE" FontFamily="Inter" FontSize="19" Cursor=""/>
+            </Button>
+
+            <Button x:Name="WP_Button_LoadPRG" Foreground="#EEEEEE" IsEnabled="{Binding button_LOAD_enabled}" FontFamily="Inter" FontSize="20" Width="Auto" Height="Auto" Grid.Column="2" Margin="5,5" Click="btnLoadPRG_Click" Cursor="Hand">
+                <TextBlock Text="ЗАГРУЗИТЬ ПРОГРАММУ" TextWrapping="Wrap" TextAlignment="Center" Foreground="#EEEEEE" FontFamily="Inter" FontSize="19" Cursor=""/>
+            </Button>
+            <Button x:Name="WP_Button_UnLoadPRG" Foreground="#EEEEEE" IsEnabled="{Binding button_UNLOAD_enabled}" FontFamily="Inter" FontSize="20" Width="Auto" Height="Auto" Grid.Column="3" Margin="5,5" Click="btnUnloadPRG_Click">
+                <TextBlock Text="ВЫГРУЗИТЬ ПРОГРАММУ" TextWrapping="Wrap" TextAlignment="Center" Foreground="#EEEEEE" FontFamily="Inter" FontSize="19" Cursor=""/>
+            </Button>
+            <Button Foreground="#EEEEEE" FontFamily="Inter" Content="" FontSize="20" Width="Auto" Height="Auto" Grid.Column="1" Margin="5,5" IsEnabled="False" />
+            <Button Foreground="#EEEEEE" FontFamily="Inter" Content="" FontSize="20" Width="Auto" Height="Auto" Grid.Column="4" Margin="5,5" IsEnabled="False" />
+            <Button Foreground="#EEEEEE" FontFamily="Inter" Content="" FontSize="20" Width="Auto" Height="Auto" Grid.Column="5" Margin="5,5" IsEnabled="False" />
+            <Button Foreground="#EEEEEE" FontFamily="Inter" Content="" FontSize="20" Width="Auto" Height="Auto" Grid.Column="6" Margin="5,5" IsEnabled="False" />
+            <Button x:Name="WP_Button_START" Foreground="#EEEEEE" FontFamily="Inter" Content="ПУСК" FontSize="20" Width="Auto" Height="Auto" Grid.Column="7" Margin="5,5" Click="btnStart_Click" IsEnabled="{Binding button_START_enabled}" />
+            <Button x:Name="WP_Button_PAUSE" Foreground="#EEEEEE" FontFamily="Inter" Content="ПАУЗА" FontSize="20" Width="Auto" Height="Auto" Grid.Column="8" Margin="5,5" Click="btnPause_Click" IsEnabled="{Binding button_PAUSE_enabled}"/>
+            <Button x:Name="WP_Button_STOP" Foreground="#EEEEEE" FontFamily="Inter" Content="СТОП" FontSize="20" Width="Auto" Height="Auto" Grid.Column="9" Margin="5,5,0,5" Click="btnStop_Click" IsEnabled="{Binding button_STOP_enabled}"/>
+        </Grid>
+        
+        
+        <!-- Разметка нижнего меню - РУЧНОЙ экран -->
+        <!-- {Binding Menu_Manual_Bottom_Visibility} -->
+        <Grid Grid.Row="2" Background="#31363F" ShowGridLines="False" Visibility="{Binding Menu_Manual_Bottom_Visibility}" IsEnabled="{Binding Menu_Manual_Bottom_IsEnabled}" Cursor="">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Нижнее меню #1 - главное -->
+            <Button x:Name="WP_Button_Manual_1" Foreground="#EEEEEE" FontFamily="Inter" Content="" FontSize="20" Width="Auto" Height="Auto" Grid.Column="0" Margin="5,5"  />
+            <Button x:Name="WP_Button_Manual_2" Foreground="#EEEEEE" FontFamily="Inter" Content="" FontSize="20" Width="Auto" Height="Auto" Grid.Column="1" Margin="5,5" />
+            <Button x:Name="WP_Button_Manual_3" Foreground="#EEEEEE" FontFamily="Inter" Content="" FontSize="20" Width="Auto" Height="Auto" Grid.Column="2" Margin="5,5" />
+            <Button x:Name="WP_Button_Manual_4" Foreground="#EEEEEE" FontFamily="Inter" Content="" FontSize="20" Width="Auto" Height="Auto" Grid.Column="3" Margin="5,5" />
+            <Button x:Name="WP_Button_Manual_5" Foreground="#EEEEEE" FontFamily="Inter" Content="" FontSize="20" Width="Auto" Height="Auto" Grid.Column="4" Margin="5,5" />
+            <Button x:Name="WP_Button_Manual_6" Foreground="#EEEEEE" FontFamily="Inter" Content="" FontSize="20" Width="Auto" Height="Auto" Grid.Column="5" Margin="5,5" />
+            <Button x:Name="WP_Button_Manual_7" Foreground="#EEEEEE" FontFamily="Inter" Content="" FontSize="20" Width="Auto" Height="Auto" Grid.Column="6" Margin="5,5"  />
+            <Button x:Name="WP_Button_Manual_8" Foreground="#EEEEEE" FontFamily="Inter" Content="" FontSize="20" Width="Auto" Height="Auto" Grid.Column="7" Margin="5,5"  />
+            <Button x:Name="WP_Button_Manual_9" Foreground="#EEEEEE" FontFamily="Inter" Content="" FontSize="20" Width="Auto" Height="Auto" Grid.Column="8" Margin="5,5" />
+            <Button x:Name="WP_Button_Manual_10" Foreground="#EEEEEE" FontFamily="Inter" Content="" FontSize="20" Width="Auto" Height="Auto" Grid.Column="9" Margin="5,5,0,5" />
+        </Grid>
+        <!-- конец разметки нижнего меню -->
+        <!-- Разметка нижнего меню - РЕДАКТОР -->
+        <Grid Grid.Row="2" Background="#31363F" ShowGridLines="False" Visibility="{Binding Menu_Editor_Bottom_Visibility}" IsEnabled="{Binding Menu_Editor_Bottom_IsEnabled}" Cursor="">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Нижнее меню #1 - главное -->
+            <Button x:Name="WP_Button_Editor_1" Foreground="#EEEEEE" FontFamily="Inter" FontSize="20" Width="Auto" Height="Auto" Grid.Column="2" Margin="5,5" Padding="0" Click="WP_Editor_Button_RenameFile_Click">
+                <TextBlock TextWrapping="Wrap" TextAlignment="Center" Foreground="#EEEEEE" FontFamily="Inter" FontSize="19">ИЗМЕНИТЬ <LineBreak/> ИМЯ ФАЙЛА</TextBlock>
+            </Button>
+
+            <Button x:Name="WP_Button_Editor_2" Foreground="#EEEEEE" FontFamily="Inter" FontSize="20" Width="Auto" Height="Auto" Grid.Column="0" Margin="5,5" Click="WP_Editor_Save_File_Click">
+                <TextBlock TextWrapping="Wrap" TextAlignment="Center" Foreground="#EEEEEE" FontFamily="Inter" FontSize="19">СОХРАНИТЬ ФАЙЛ</TextBlock>
+            </Button>
+
+            <Button x:Name="WP_Button_Editor_3" Foreground="#EEEEEE" FontFamily="Inter" FontSize="20" Width="Auto" Height="Auto" Grid.Column="3" Margin="5,5" Click="WP_Editor_Button_CopyFiles_Click">
+                <TextBlock TextWrapping="Wrap" TextAlignment="Center" Foreground="#EEEEEE" FontFamily="Inter" FontSize="19" Cursor="">КОПИЯ ФАЙЛА</TextBlock>
+            </Button>
+
+            <Button x:Name="WP_Editor_Button_CreateFile" Foreground="#EEEEEE" FontFamily="Inter" FontSize="20" Width="Auto" Height="Auto" Grid.Column="1" Margin="5,5" Click="WP_Editor_Button_CreateFile_Click">
+                <TextBlock TextWrapping="Wrap" TextAlignment="Center" Foreground="#EEEEEE" FontFamily="Inter" FontSize="19">СОЗДАТЬ ФАЙЛ</TextBlock>
+            </Button>
+
+            <Button x:Name="WP_Button_Editor_5" Foreground="#EEEEEE" FontFamily="Inter" FontSize="20" Width="Auto" Height="Auto" Padding="0" Grid.Column="4" Margin="5,5" Click="WP_Editor_Button_CreateDirectory_Click">
+                <TextBlock TextWrapping="Wrap" TextAlignment="Center" Foreground="#EEEEEE" FontFamily="Inter" FontSize="19" Cursor="">СОЗДАТЬ ДИРЕКТОРИЮ</TextBlock>
+            </Button>
+
+            <Button x:Name="WP_Button_Editor_6" Foreground="#EEEEEE" FontFamily="Inter" FontSize="20" Width="Auto" Height="Auto" Grid.Column="5" Margin="5,5">
+                <TextBlock TextWrapping="Wrap" TextAlignment="Center" Foreground="#EEEEEE" FontFamily="Inter" FontSize="19"> </TextBlock>
+            </Button>
+
+            <Button x:Name="WP_Button_Editor_7" Foreground="#EEEEEE" FontFamily="Inter" Content="" FontSize="20" Width="Auto" Height="Auto" Grid.Column="6" Margin="5,5"  />
+            
+            <Button x:Name="WP_Button_Editor_8" Foreground="#EEEEEE" FontFamily="Inter" Content="" FontSize="20" Width="Auto" Height="Auto" Grid.Column="7" Margin="5,5"  />
+
+            <Button x:Name="WP_Button_Editor_9" Foreground="#EEEEEE" FontFamily="Inter" FontSize="20" Width="Auto" Height="Auto" Padding="0" Grid.Column="8" Margin="5,5" Click="WP_Editor_Button_RemoveDirectory_Click">
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center" Foreground="#EEEEEE" FontFamily="Inter" FontSize="19" >УДАЛИТЬ ДИРЕКТОРИЮ</TextBlock>
+            </Button>
+
+            <Button x:Name="WP_Button_Editor_10" Foreground="#EEEEEE" FontFamily="Inter" FontSize="20" Width="Auto" Height="Auto" Grid.Column="9" Margin="5,5,0,5" Click="WP_Editor_Button_RemoveFile_Click">
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center" Foreground="#EEEEEE" FontFamily="Inter" FontSize="19">УДАЛИТЬ ФАЙЛ</TextBlock>
+            </Button>
+        </Grid>
+        <!-- конец разметки нижнего меню -->
+    </Grid>
+</Window>

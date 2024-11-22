@@ -1,0 +1,31 @@
+﻿<Window x:Class="ModbusWPFproject.Window_Reconnect"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ModbusWPFproject"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        xmlns:winex="https://github.com/yariker/WindowExtras.Wpf"
+        mc:Ignorable="d"
+        WindowStyle="None" 
+        ResizeMode="NoResize" 
+        Title="Window1" Height="204" Width="362"
+        WindowStartupLocation="CenterScreen"
+        AllowsTransparency="True"
+        Background="Transparent">
+    
+    <winex:WindowEx.WindowShadow>
+        <winex:WindowShadow OffsetY="0" Opacity="0.2" Radius="60" />
+    </winex:WindowEx.WindowShadow>
+    <Border Background="#EEEEEE" CornerRadius="20">
+        <Border CornerRadius="20" Margin="7" BorderThickness="1" BorderBrush="LightGray">
+
+            <Grid Margin="-10,-16,-11,-11">
+                <Label Content="Соединение отсутствует" HorizontalAlignment="Center" Margin="0,26,0,0" VerticalAlignment="Top" FontFamily="Inter" FontSize="16"/>
+                <Label Content="Выполняется попытка переподключения" HorizontalAlignment="Center" Margin="0,158,0,0" VerticalAlignment="Top" FontFamily="Inter" FontSize="16"/>
+                <fa:ImageAwesome Foreground="#FF76ABAE" HorizontalAlignment="Center" VerticalAlignment="Center" Icon="Spinner" Width="66" Height="68" Spin="True"/>
+
+            </Grid>
+        </Border>
+    </Border>
+</Window>
